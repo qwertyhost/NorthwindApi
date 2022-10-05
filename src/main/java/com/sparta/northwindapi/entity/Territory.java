@@ -1,6 +1,9 @@
 package com.sparta.northwindapi.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "territories")
@@ -11,10 +14,6 @@ public class Territory {
 
     @Column(name = "TerritoryDescription", nullable = false, length = 50)
     private String territoryDescription;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "RegionID", nullable = false)
-    private Region regionID;
 
     public String getId() {
         return id;
@@ -32,12 +31,11 @@ public class Territory {
         this.territoryDescription = territoryDescription;
     }
 
-    public Region getRegionID() {
-        return regionID;
+    @Override
+    public String toString() {
+        return "Territory{" +
+                "id='" + id + '\'' +
+                ", territoryDescription='" + territoryDescription + '\'' +
+                '}';
     }
-
-    public void setRegionID(Region regionID) {
-        this.regionID = regionID;
-    }
-
 }
