@@ -78,6 +78,7 @@ public class Employee {
     @OneToMany(mappedBy = "reportsTo")
     private Set<Employee> employees = new LinkedHashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "employeeID")
     private Set<Order> orders = new LinkedHashSet<>();
 
