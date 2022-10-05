@@ -1,7 +1,13 @@
 package com.sparta.northwindapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.sql.Date;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "employees")
@@ -24,10 +30,10 @@ public class Employee {
     private String titleOfCourtesy;
 
     @Column(name = "BirthDate")
-    private Instant birthDate;
+    private Date birthDate;
 
     @Column(name = "HireDate")
-    private Instant hireDate;
+    private Date hireDate;
 
     @Column(name = "Address", length = 60)
     private String address;
@@ -57,6 +63,7 @@ public class Employee {
     @Column(name = "Notes", nullable = false)
     private String notes;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ReportsTo")
     private Employee reportsTo;
@@ -66,6 +73,19 @@ public class Employee {
 
     @Column(name = "Salary")
     private Float salary;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "reportsTo")
+    private Set<Employee> employees = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "employeeID")
+    private Set<Order> orders = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "employeeterritories",
+            joinColumns = @JoinColumn(name = "EmployeeID"),
+            inverseJoinColumns = @JoinColumn(name = "TerritoryID"))
+    private Set<Territory> territories = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -107,19 +127,19 @@ public class Employee {
         this.titleOfCourtesy = titleOfCourtesy;
     }
 
-    public Instant getBirthDate() {
+    public Date getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Instant birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
 
-    public Instant getHireDate() {
+    public Date getHireDate() {
         return hireDate;
     }
 
-    public void setHireDate(Instant hireDate) {
+    public void setHireDate(Date hireDate) {
         this.hireDate = hireDate;
     }
 
@@ -219,4 +239,55 @@ public class Employee {
         this.salary = salary;
     }
 
+    public Set<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(Set<Employee> employees) {
+        this.employees = employees;
+    }
+
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    public Set<Territory> getTerritories() {
+        return territories;
+    }
+
+    public void setTerritories(Set<Territory> territories) {
+        this.territories = territories;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", lastName='" + lastName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", title='" + title + '\'' +
+                ", titleOfCourtesy='" + titleOfCourtesy + '\'' +
+                ", birthDate=" + birthDate +
+                ", hireDate=" + hireDate +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", region='" + region + '\'' +
+                ", postalCode='" + postalCode + '\'' +
+                ", country='" + country + '\'' +
+                ", homePhone='" + homePhone + '\'' +
+                ", extension='" + extension + '\'' +
+                ", photo=" + Arrays.toString(photo) +
+                ", notes='" + notes + '\'' +
+                ", reportsTo=" + reportsTo +
+                ", photoPath='" + photoPath + '\'' +
+                ", salary=" + salary +
+                ", employees=" + employees +
+                ", orders=" + orders +
+                ", territories=" + territories +
+                '}';
+    }
 }

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Embeddable
 public class EmployeeterritoryId implements Serializable {
-    private static final long serialVersionUID = -6313916111973635085L;
+    private static final long serialVersionUID = -7399461317395404042L;
     @Column(name = "EmployeeID", nullable = false)
     private Integer employeeID;
 
@@ -46,4 +46,11 @@ public class EmployeeterritoryId implements Serializable {
         return Objects.hash(territoryID, employeeID);
     }
 
+    @Override
+    public String toString() {
+        return "EmployeeterritoryId{" +
+                "employeeID=" + employeeID +
+                ", territoryID='" + territoryID + '\'' +
+                '}';
+    }
 }

@@ -42,4 +42,12 @@ public class Employeeterritory {
         this.territoryID = territoryID;
     }
 
+    @Override
+    public String toString() {
+        return "Employeeterritory{" +
+                "id=" + id +
+                ", employeeID=" + employeeID +
+                ", territoryID=" + territoryID +
+                '}';
+    }
 }
