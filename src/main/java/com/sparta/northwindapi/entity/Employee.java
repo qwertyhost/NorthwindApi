@@ -1,5 +1,7 @@
 package com.sparta.northwindapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Arrays;
@@ -63,6 +65,7 @@ public class Employee {
     private Employee reportsTo;
 
     @Column(name = "PhotoPath")
+    @JsonIgnore
     private String photoPath;
 
     @Column(name = "Salary")
