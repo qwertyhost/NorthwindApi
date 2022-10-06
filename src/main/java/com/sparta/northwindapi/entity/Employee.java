@@ -64,7 +64,6 @@ public class Employee {
     @JoinColumn(name = "ReportsTo")
     private Employee reportsTo;
 
-    @JsonIgnore
     @Column(name = "PhotoPath")
     private String photoPath;
 
@@ -244,7 +243,7 @@ public class Employee {
                 ", photo=" + Arrays.toString(photo) +
                 ", notes='" + notes + '\'' +
                 ", reportsTo=" + reportsTo.getReportsTo().firstName + " "+ reportsTo.getReportsTo().lastName +
-                ", photoPath='" + photoPath + '\'' +
+                ", photoPath='" + (photoPath.length()>0) + '\'' +
                 ", salary=" + salary +
                 '}';
     }
