@@ -64,8 +64,8 @@ public class Employee {
     @JoinColumn(name = "ReportsTo")
     private Employee reportsTo;
 
-    @Column(name = "PhotoPath")
     @JsonIgnore
+    @Column(name = "PhotoPath")
     private String photoPath;
 
     @Column(name = "Salary")
