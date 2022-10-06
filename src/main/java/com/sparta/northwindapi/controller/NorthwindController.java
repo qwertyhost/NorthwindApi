@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -73,7 +71,7 @@ public class NorthwindController {
 
     @GetMapping("/region/all")
     public ResponseEntity<String> getAllRegions() {
-        List<RegionDTO> regions = regionDAO.getAllRegions();
+        List<RegionDTO> regions = regionDAO.getAll();
         mapper = new ObjectMapper();
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
@@ -95,7 +93,7 @@ public class NorthwindController {
 
     @GetMapping("/region/{id}")
     public ResponseEntity<String> getRegion(@PathVariable int id) {
-        RegionDTO region = regionDAO.getRegionById(id);
+        RegionDTO region = regionDAO.get(id);
         mapper = new ObjectMapper();
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
@@ -109,10 +107,59 @@ public class NorthwindController {
                 throw new RuntimeException(e);
             }
         } else {
+            result = new ResponseEntity<>("{\"message\":\"Regions not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PostMapping("/region")
+    public ResponseEntity<String> createRegion(@RequestBody RegionDTO region) {
+        RegionDTO inserted = regionDAO.create(region);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result;
+        if (inserted != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(inserted), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            result = new ResponseEntity<>("{\"message\":\"Region already exists\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PatchMapping("/region/{id}")
+    public ResponseEntity<String> updateRegion(@PathVariable int id, @RequestBody RegionDTO region) {
+        RegionDTO updated = regionDAO.update(region, id);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result;
+        if (updated != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(updated), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
             result = new ResponseEntity<>("{\"message\":\"Region not found\"}",
                     headers, HttpStatus.OK);
         }
         return result;
+    }
+
+    @PutMapping("/region/{id}")
+    public RegionDTO updateOrCreateRegion(@PathVariable int id, @RequestBody RegionDTO region) {
+        return regionDAO.updateOrCreate(region, id);
     }
 
     @GetMapping("/territory/all")

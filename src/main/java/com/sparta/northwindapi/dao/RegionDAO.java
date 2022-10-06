@@ -15,7 +15,7 @@ public class RegionDAO {
 
     public RegionDAO(RegionRepository repo) { this.REPO = repo; }
 
-    public RegionDTO getRegionById(int id) {
+    public RegionDTO get(int id) {
         Optional<Region> optional = REPO.findById(id);
         Region region;
         if (optional.isPresent())
@@ -25,10 +25,40 @@ public class RegionDAO {
         return new RegionDTO(region.getId(), region.getRegionDescription());
     }
 
-    public List<RegionDTO> getAllRegions() {
+    public List<RegionDTO> getAll() {
         List<Region> regions = REPO.findAll();
         if (regions.isEmpty())
             return null;
         return regions.stream().map(r -> new RegionDTO(r.getId(), r.getRegionDescription())).toList();
+    }
+
+    public RegionDTO create(RegionDTO region) {
+        boolean exists = this.get(region.getId()) != null;
+        if (exists)
+            return null;
+        Region toInsert = new Region();
+        toInsert.setId(region.getId());
+        toInsert.setRegionDescription(region.getRegionDescription());
+        Region inserted = REPO.save(toInsert);
+        return new RegionDTO(inserted.getId(), inserted.getRegionDescription());
+    }
+
+    public RegionDTO update(RegionDTO updated, int id) {
+        boolean exists = this.get(id) != null;
+        if (!exists)
+            return null;
+        Region toUpdate = new Region();
+        toUpdate.setId(id);
+        toUpdate.setRegionDescription(updated.getRegionDescription());
+        Region result = REPO.save(toUpdate);
+        return new RegionDTO(result.getId(), result.getRegionDescription());
+    }
+
+    public RegionDTO updateOrCreate(RegionDTO updated, int id) {
+        Region toUpdate = new Region();
+        toUpdate.setId(id);
+        toUpdate.setRegionDescription(updated.getRegionDescription());
+        Region result = REPO.save(toUpdate);
+        return new RegionDTO(result.getId(), result.getRegionDescription());
     }
 }
