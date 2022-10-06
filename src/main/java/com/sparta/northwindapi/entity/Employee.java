@@ -2,6 +2,7 @@ package com.sparta.northwindapi.entity;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Arrays;
 
 @Entity
 @Table(name = "employees")
@@ -219,4 +220,29 @@ public class Employee {
         this.salary = salary;
     }
 
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", lastName='" + lastName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", title='" + title + '\'' +
+                ", titleOfCourtesy='" + titleOfCourtesy + '\'' +
+                ", birthDate=" + birthDate +
+                ", hireDate=" + hireDate +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", region='" + region + '\'' +
+                ", postalCode='" + postalCode + '\'' +
+                ", country='" + country + '\'' +
+                ", homePhone='" + homePhone + '\'' +
+                ", extension='" + extension + '\'' +
+                ", photo=" + Arrays.toString(photo) +
+                ", notes='" + notes + '\'' +
+                ", reportsTo=" + reportsTo.getReportsTo().firstName + " "+ reportsTo.getReportsTo().lastName +
+                ", photoPath='" + photoPath + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
 }

@@ -5,6 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "employeeterritories")
 public class Employeeterritory {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EmbeddedId
     private EmployeeterritoryId id;
 
