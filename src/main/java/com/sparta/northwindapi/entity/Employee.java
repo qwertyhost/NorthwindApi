@@ -56,6 +56,7 @@ public class Employee {
     @Column(name = "Extension", length = 4)
     private String extension;
 
+    @JsonIgnore
     @Column(name = "Photo")
     private byte[] photo;
 

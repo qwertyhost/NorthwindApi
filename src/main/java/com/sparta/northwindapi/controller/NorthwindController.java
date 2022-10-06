@@ -2,6 +2,8 @@ package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.northwindapi.dao.OrderDAO;
+import com.sparta.northwindapi.dto.OrderDTO;
 import com.sparta.northwindapi.entity.Employee;
 import com.sparta.northwindapi.entity.Order;
 import com.sparta.northwindapi.entity.Region;
@@ -15,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,16 +26,17 @@ public class NorthwindController {
     private final EmployeeRepository employeeRepository;
     private final TerritoryRepository territoryRepository;
     private final RegionRepository regionRepository;
-    private final OrderRepository orderRepository;
+
+    private final OrderDAO orderDAO;
 
     private ObjectMapper mapper;
     private HttpHeaders headers;
 
-    public NorthwindController(EmployeeRepository employeeRepository, TerritoryRepository territoryRepository, RegionRepository regionRepository, OrderRepository orderRepository) {
+    public NorthwindController(EmployeeRepository employeeRepository, TerritoryRepository territoryRepository, RegionRepository regionRepository, OrderDAO orderDAO) {
         this.employeeRepository = employeeRepository;
         this.territoryRepository = territoryRepository;
         this.regionRepository = regionRepository;
-        this.orderRepository = orderRepository;
+        this.orderDAO = orderDAO;
         mapper = new ObjectMapper();
     }
 
@@ -243,27 +245,27 @@ public class NorthwindController {
     }
 
     @GetMapping("/order/all")
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderDTO> getAllOrders() {
+        return orderDAO.getAllOrders();
     }
 
     @GetMapping("/order/{id}")
     public ResponseEntity<String> getOrder(@PathVariable int id) {
-        Optional<Order> foundOrder = orderRepository.findById(id);
+        OrderDTO foundOrder = orderDAO.getByID(id);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundOrder.isPresent()) {
+        if (foundOrder != null) {
             try {
                 result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundOrder.get()), headers,
+                        mapper.writeValueAsString(foundOrder), headers,
                         HttpStatus.OK);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
         else {
-            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
+            result = new ResponseEntity<>("{\"message\":\"Order not found\"}",
                     headers, HttpStatus.OK);
         }
         return result;
@@ -271,7 +273,7 @@ public class NorthwindController {
 
     @PostMapping("/order")
     public ResponseEntity<String> addNewOrder(@RequestBody Order newOrder) {
-        Order savedOrder = orderRepository.save(newOrder);
+        OrderDTO savedOrder = orderDAO.addNewOrder(newOrder);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
@@ -291,16 +293,37 @@ public class NorthwindController {
         return result;
     }
 
-    @DeleteMapping("/order/remove/{id}")
-    public ResponseEntity<String> deleteOrder(@PathVariable(name = "id") int id) {
-        Optional<Order> foundOrder = orderRepository.findById(id);
+    @PatchMapping("/order")
+    public ResponseEntity<String> updateOrder(@RequestBody Order order) {
+        OrderDTO updatedOrder = orderDAO.update(order);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundOrder.isPresent()) {
-            orderRepository.delete(foundOrder.get());
+        if (updatedOrder != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(updatedOrder), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Order could not be updated\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @DeleteMapping("/order/remove/{id}")
+    public ResponseEntity<String> deleteOrder(@PathVariable(name = "id") int id) {
+        int deletedOrderId = orderDAO.deleteOrder(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (deletedOrderId != -1) {
             result = new ResponseEntity<>(
-                    "Region removed", headers,
+                    "Order removed", headers,
                     HttpStatus.OK);
         }
         else {
