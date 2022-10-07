@@ -1,5 +1,6 @@
 package com.sparta.northwindapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.northwindapi.dto.OrderDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,8 +29,17 @@ public class OrderTests {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        OrderDTO newOrder = new OrderDTO(2222,new Date(1996,7,8),new Date(1996,7,8),
+                new Date(1996,7,8), new BigDecimal(99.77), "Boaty McBoatFace", "A port", "A city",
+                "RJ","05454-876","Brazil");
+        String body = objectMapper.writeValueAsString(newOrder);
+        MvcResult result = mockMvc.perform(
+                post("http://localhost:8080/order")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isCreated()).andReturn();
     }
 
     @Test
@@ -60,7 +70,7 @@ public class OrderTests {
 
     @Test
     public void postOrder() throws Exception {
-        OrderDTO newOrder = new OrderDTO(2222,new Date(1996,7,8),new Date(1996,7,8),
+        OrderDTO newOrder = new OrderDTO(2223,new Date(1996,7,8),new Date(1996,7,8),
                 new Date(1996,7,8), new BigDecimal(99.77), "Boaty McBoatFace", "A port", "A city",
                 "RJ","05454-876","Brazil");
         String body = objectMapper.writeValueAsString(newOrder);
@@ -70,16 +80,49 @@ public class OrderTests {
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isCreated()).andReturn();
 
-        assertTrue(result.getResponse().getContentAsString().contains("2222"));
+        assertTrue(result.getResponse().getContentAsString().contains("2223"));
         assertTrue(result.getResponse().getContentAsString().contains("Boaty McBoatFace"));
         assertTrue(result.getResponse().getContentAsString().contains("05454-876"));
         assertTrue(result.getResponse().getContentAsString().contains("Brazil"));
     }
 
     @Test
+    public void updateOrder_ShipName() throws Exception {
+        OrderDTO newOrder = new OrderDTO(2222,null,null,
+                null, null, "Itsy Bitsy Teeny Weeny Tugboaty", null, null,
+                null,null,null);
+        String body = objectMapper.writeValueAsString(newOrder);
+        MvcResult result = mockMvc.perform(
+                patch("http://localhost:8080/order")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+        assertTrue(result.getResponse().getContentAsString().contains("2222"));
+        assertTrue(result.getResponse().getContentAsString().contains("Itsy Bitsy Teeny Weeny Tugboaty"));
+    }
+
+    @Test
+    public void updateOrder_ShipAddress() throws Exception {
+        OrderDTO newOrder = new OrderDTO(2222,null,null,
+                null, null, null, null, null,
+                null,null,"United Kingdom");
+        String body = objectMapper.writeValueAsString(newOrder);
+        MvcResult result = mockMvc.perform(
+                patch("http://localhost:8080/order")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("2222"));
+        assertTrue(result.getResponse().getContentAsString().contains("United Kingdom"));
+    }
+
+    @Test
     public void removeOrder() throws Exception {
         MvcResult result = mockMvc.perform(
-                delete("http://localhost:8080/order/remove/10249")
+                delete("http://localhost:8080/order/remove/2222")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk()).andReturn();
 
