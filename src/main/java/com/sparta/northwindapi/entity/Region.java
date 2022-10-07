@@ -1,10 +1,9 @@
 package com.sparta.northwindapi.entity;
 
-import com.sparta.northwindapi.entity.Territory;
-
-import javax.persistence.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.Column;
 
 @Entity
 @Table(name = "Region")
