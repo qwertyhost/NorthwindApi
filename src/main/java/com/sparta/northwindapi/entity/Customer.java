@@ -1,16 +1,15 @@
 package com.sparta.northwindapi.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "customers")
 public class Customer {
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Basic(optional = false)
     @Column(name = "CustomerID", nullable = false, length = 5)
-    private String id;
+    private String CustomerID;
 
     @Column(name = "CompanyName", nullable = false, length = 40)
     private String companyName;
@@ -42,12 +41,30 @@ public class Customer {
     @Column(name = "Fax", length = 24)
     private String fax;
 
+    public Customer(String id, String companyName, String contactName, String contactTitle, String address, String city, String region, String postalCode, String country, String phone, String fax) {
+        this.CustomerID = id;
+        this.companyName = companyName;
+        this.contactName = contactName;
+        this.contactTitle = contactTitle;
+        this.address = address;
+        this.city = city;
+        this.region = region;
+        this.postalCode = postalCode;
+        this.country = country;
+        this.phone = phone;
+        this.fax = fax;
+    }
+
+    public Customer() {
+
+    }
+
     public String getId() {
-        return id;
+        return CustomerID;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.CustomerID = id;
     }
 
     public String getCompanyName() {

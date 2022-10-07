@@ -398,10 +398,26 @@ public class NorthwindController {
     }
 
     @PostMapping("/customer")
-    public boolean newCustomer(String id,String companyName,String contactName,String contactTitle,String address,String city,String region,String postalCode,String country,String phone,String fax){
+    public ResponseEntity<String> newCustomer(@RequestBody Customer newCustomer){
         CustomerDAO customerDAO= new CustomerDAO(customerRepo);
-        CustomerDto c = new CustomerDto(id, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-        return customerDAO.create(c);
+        CustomerDto savedCustomer = customerDAO.create(newCustomer);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (savedCustomer != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(savedCustomer), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Customer could not be added\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
     }
     
     @DeleteMapping("/customer/{id}")

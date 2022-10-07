@@ -1,6 +1,7 @@
 package com.sparta.northwindapi.dao;
 
 import com.sparta.northwindapi.dto.CustomerDto;
+import com.sparta.northwindapi.dto.OrderDTO;
 import com.sparta.northwindapi.entity.Customer;
 import com.sparta.northwindapi.repo.CustomerRepository;
 import org.springframework.stereotype.Service;
@@ -72,27 +73,14 @@ public class CustomerDAO {
         customerRepo.deleteById(id);
     }
 
-    public boolean create(CustomerDto customerDto){
-        Optional<Customer> optional = customerRepo.findById(customerDto.getId());
-        Customer customer;
-        if(optional.isPresent()){
-            customer = optional.get();
-        }else {
-            return false;
+    public CustomerDto create(Customer customer){
+        Customer cust = customerRepo.save(customer);
+        if (cust != null) {
+            return new CustomerDto(cust.getId(),cust.getCompanyName(),cust.getCompanyName(),cust.getContactTitle(),cust.getAddress(),cust.getCity(),cust.getRegion(),
+            cust.getPostalCode(),cust.getCountry(),cust.getPhone(),cust.getFax());
+        } else {
+            return new CustomerDto("ABCDE",null,null,null,null,null,null,null,null,null,null);
         }
-        customer.setId(customerDto.getId());
-        customer.setCompanyName(customerDto.getCompanyName());
-        customer.setContactName(customerDto.getContactName());
-        customer.setContactTitle(customerDto.getContactTitle());
-        customer.setAddress(customerDto.getAddress());
-        customer.setCity(customerDto.getCity());
-        customer.setRegion(customerDto.getRegion());
-        customer.setPostalCode(customerDto.getPostalCode());
-        customer.setCountry(customerDto.getCountry());
-        customer.setPhone(customerDto.getPhone());
-        customer.setFax(customerDto.getFax());
-        customerRepo.save(customer);
-        return true;
     }
 
     public Customer read(String id){
