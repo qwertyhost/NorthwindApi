@@ -85,6 +85,26 @@ public class SupplierDAO {
                 supplier.getFax(), supplier.getHomePage());
     }
 
+    //CREATE
+    public SupplierDTO addNewSupplier(Supplier newSupplier) {
+        Supplier savedSupplier = supplierRepository.save(newSupplier);
+        if(savedSupplier != null)
+            return convertSupplier(savedSupplier);
+        else
+            return new SupplierDTO(-1, null, null, null, null, null, null, null, null, null, null, null);
+    }
+
+    public int deleteSupplier(int id) {
+        Optional<Supplier> foundSupplier = supplierRepository.findById(id);
+        if (foundSupplier.isPresent()) {
+            supplierRepository.delete(foundSupplier.get());
+            return foundSupplier.get().getId();
+        }
+        else {
+            return -1;
+        }
+    }
+
 
     public SupplierDTO convertSupplier(Supplier supplier) {
         SupplierDTO converted = new SupplierDTO(supplier.getId(), supplier.getCompanyName(), supplier.getContactName(), supplier.getContactTitle(),
