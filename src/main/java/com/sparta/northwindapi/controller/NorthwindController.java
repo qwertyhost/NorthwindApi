@@ -2,6 +2,15 @@ package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.sparta.northwindapi.dao.CustomerDAO;
+import com.sparta.northwindapi.dto.CustomerDto;
+import com.sparta.northwindapi.entity.Customer;
+import com.sparta.northwindapi.entity.Employee;
+import com.sparta.northwindapi.entity.Region;
+import com.sparta.northwindapi.entity.Territory;
+import com.sparta.northwindapi.repo.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.sparta.northwindapi.dao.OrderDAO;
 import com.sparta.northwindapi.dao.SupplierDAO;
 import com.sparta.northwindapi.dto.OrderDTO;
@@ -21,6 +30,10 @@ import java.util.Optional;
 @RestController
 public class NorthwindController {
 
+
+    @Autowired
+    private CustomerRepository customerRepo;
+        
     private final EmployeeRepository employeeRepository;
     private final TerritoryRepository territoryRepository;
     private final RegionRepository regionRepository;
@@ -38,210 +51,6 @@ public class NorthwindController {
         this.orderDAO = orderDAO;
         this.supplierDAO = supplierDAO;
         mapper = new ObjectMapper();
-    }
-
-    @GetMapping("/employee/all")
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
-
-    @GetMapping("/employee/{id}")
-    public ResponseEntity<String> getEmployee(@PathVariable int id) {
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundEmployee.isPresent()) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundEmployee.get()), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Employee not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @PostMapping("/employee")
-    public ResponseEntity<String> addNewEmployee(@RequestBody Employee newEmployee) {
-        Employee savedEmployee = employeeRepository.save(newEmployee);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (savedEmployee != null) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(savedEmployee), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Employee could not be added\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @DeleteMapping("/employee/remove/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable(name = "id") int id) {
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundEmployee.isPresent()) {
-            employeeRepository.delete(foundEmployee.get());
-            result = new ResponseEntity<>(
-                        "Employee removed", headers,
-                        HttpStatus.OK);
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Employee could not be removed\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @GetMapping("/region/all")
-    public List<Region> getAllRegions() {
-        return regionRepository.findAll();
-    }
-
-    @GetMapping("/region/{id}")
-    public ResponseEntity<String> getRegion(@PathVariable int id) {
-        Optional<Region> foundRegion = regionRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundRegion.isPresent()) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundRegion.get()), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Region not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @PostMapping("/region")
-    public ResponseEntity<String> addNewRegion(@RequestBody Region newRegion) {
-        Region savedRegion = regionRepository.save(newRegion);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (savedRegion != null) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(savedRegion), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Region could not be added\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @DeleteMapping("/region/remove/{id}")
-    public ResponseEntity<String> deleteRegion(@PathVariable(name = "id") int id) {
-        Optional<Region> foundRegion = regionRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundRegion.isPresent()) {
-            regionRepository.delete(foundRegion.get());
-            result = new ResponseEntity<>(
-                    "Region removed", headers,
-                    HttpStatus.OK);
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Region could not be removed\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @GetMapping("/territory/all")
-    public List<Territory> getAllTerritories() {
-        return territoryRepository.findAll();
-    }
-
-    @GetMapping("/territory/{id}")
-    public ResponseEntity<String> getTerritory(@PathVariable String id) {
-        Optional<Territory> foundTerritory = territoryRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundTerritory.isPresent()) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundTerritory.get()), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @PostMapping("/territory")
-    public ResponseEntity<String> addNewTerritory(@RequestBody Territory newTerritory) {
-        Territory savedTerritory = territoryRepository.save(newTerritory);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (savedTerritory != null) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(savedTerritory), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Territory could not be added\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @DeleteMapping("/territory/remove/{id}")
-    public ResponseEntity<String> deleteTerritory(@PathVariable(name = "id") String id) {
-        Optional<Territory> foundTerritory = territoryRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundTerritory.isPresent()) {
-            territoryRepository.delete(foundTerritory.get());
-            result = new ResponseEntity<>(
-                    "Region removed", headers,
-                    HttpStatus.OK);
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Territory could not be removed\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
     }
 
     @GetMapping("/order/all")
@@ -387,8 +196,33 @@ public class NorthwindController {
         }
         return result;
     }
+    
+    @PatchMapping("/customer/{id}/{companyName}")
+    public CustomerDto updateCustomerName(@PathVariable String id, @PathVariable String companyName) {
+        CustomerDto customerDto = new CustomerDto(id, companyName, null, null, null, null, null, null, null, null, null);
+        CustomerDAO customerDAO = new CustomerDAO(customerRepo);
+        return customerDAO.update(customerDto);
+    }
 
+    @GetMapping("/customer/all")
+    public List<Customer> getAllCustomers(){
+        CustomerDAO customerDAO = new CustomerDAO(customerRepo);
+        return customerDAO.readAll();
+    }
 
+    @PostMapping("/customer")
+    public boolean newCustomer(String id,String companyName,String contactName,String contactTitle,String address,String city,String region,String postalCode,String country,String phone,String fax){
+        CustomerDAO customerDAO= new CustomerDAO(customerRepo);
+        CustomerDto c = new CustomerDto(id, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+        return customerDAO.create(c);
+    }
+    
+    @DeleteMapping("/customer/{id}")
+    public void deleteCustomer(@PathVariable String id){
+        CustomerDAO customerDAO= new CustomerDAO(customerRepo);
+        customerDAO.delete(id);
+    }
+    
     @DeleteMapping("/supplier/remove/{id}")
     public ResponseEntity<String> deleteSupplier(@PathVariable(name = "id") int id) {
         int deletedSupplierId = supplierDAO.deleteSupplier(id);
@@ -402,6 +236,7 @@ public class NorthwindController {
         }
         else {
             result = new ResponseEntity<>("{\"message\":\"Supplier could not be removed\"}",
+
                     headers, HttpStatus.OK);
         }
         return result;
