@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,12 +60,30 @@ public class NorthwindController {
     }
 
     @PatchMapping("/customer/{id}/{companyName}")
-    public CustomerDto updateCustomerName(@PathVariable String id, @PathVariable String companyName){
-        CustomerDto customerDto = new CustomerDto(id,companyName,null,null,null,null,null,null,null,null,null);
+    public CustomerDto updateCustomerName(@PathVariable String id, @PathVariable String companyName) {
+        CustomerDto customerDto = new CustomerDto(id, companyName, null, null, null, null, null, null, null, null, null);
         CustomerDAO customerDAO = new CustomerDAO(customerRepo);
         return customerDAO.update(customerDto);
     }
 
+    @GetMapping("/customer/all")
+    public List<Customer> getAllCustomers(){
+        CustomerDAO customerDAO = new CustomerDAO(customerRepo);
+        return customerDAO.readAll();
+    }
+
+    @PostMapping("/customer")
+    public boolean newCustomer(String id,String companyName,String contactName,String contactTitle,String address,String city,String region,String postalCode,String country,String phone,String fax){
+        CustomerDAO customerDAO= new CustomerDAO(customerRepo);
+        CustomerDto c = new CustomerDto(id, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+        return customerDAO.create(c);
+    }
+
+    @DeleteMapping("/customer/{id}")
+    public void deleteCustomer(@PathVariable String id){
+        CustomerDAO customerDAO= new CustomerDAO(customerRepo);
+        customerDAO.delete(id);
+    }
 
     @GetMapping("/territory/{id}")
     public ResponseEntity<String> getTerritory(@PathVariable String id) {

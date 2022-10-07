@@ -5,6 +5,7 @@ import com.sparta.northwindapi.entity.Customer;
 import com.sparta.northwindapi.repo.CustomerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,5 +66,40 @@ public class CustomerDAO {
                 ,customer.getContactTitle(),customer.getAddress(),customer.getCity(),
                 customer.getRegion(),customer.getPostalCode(),customer.getCountry(),
                 customer.getPhone(),customer.getFax());
+    }
+
+    public void delete(String id){
+        customerRepo.deleteById(id);
+    }
+
+    public boolean create(CustomerDto customerDto){
+        Optional<Customer> optional = customerRepo.findById(customerDto.getId());
+        Customer customer;
+        if(optional.isPresent()){
+            customer = optional.get();
+        }else {
+            return false;
+        }
+        customer.setId(customerDto.getId());
+        customer.setCompanyName(customerDto.getCompanyName());
+        customer.setContactName(customerDto.getContactName());
+        customer.setContactTitle(customerDto.getContactTitle());
+        customer.setAddress(customerDto.getAddress());
+        customer.setCity(customerDto.getCity());
+        customer.setRegion(customerDto.getRegion());
+        customer.setPostalCode(customerDto.getPostalCode());
+        customer.setCountry(customerDto.getCountry());
+        customer.setPhone(customerDto.getPhone());
+        customer.setFax(customerDto.getFax());
+        customerRepo.save(customer);
+        return true;
+    }
+
+    public Customer read(String id){
+        return customerRepo.findById(id).get();
+    }
+
+    public List<Customer> readAll(){
+        return customerRepo.findAll();
     }
 }
