@@ -8,7 +8,7 @@ import java.sql.Date;
 import java.time.Instant;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "Orders")
 public class Order {
     @Id
     @Column(name = "OrderID", nullable = false)
