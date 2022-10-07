@@ -153,7 +153,7 @@ public class NorthwindController {
         return supplierDAO.getByCountry(country);
     }
 
-    @GetMapping("suppler/id/{id}")
+    @GetMapping("supplier/id/{id}")
     public SupplierDTO getSupplierByID(@PathVariable int id){
         return supplierDAO.getByID(id);
     }
