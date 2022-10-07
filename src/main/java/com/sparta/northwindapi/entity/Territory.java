@@ -38,4 +38,5 @@ public class Territory {
                 ", territoryDescription='" + territoryDescription + '\'' +
                 '}';
     }
+
 }
