@@ -2,27 +2,16 @@ package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.sparta.northwindapi.dao.CustomerDAO;
-import com.sparta.northwindapi.dto.CustomerDto;
-import com.sparta.northwindapi.entity.Customer;
-import com.sparta.northwindapi.entity.Employee;
-import com.sparta.northwindapi.entity.Region;
-import com.sparta.northwindapi.entity.Territory;
-import com.sparta.northwindapi.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.sparta.northwindapi.dao.OrderDAO;
-import com.sparta.northwindapi.dao.SupplierDAO;
-import com.sparta.northwindapi.dto.OrderDTO;
-import com.sparta.northwindapi.dto.SupplierDTO;
-import com.sparta.northwindapi.entity.*;
-import com.sparta.northwindapi.repo.EmployeeRepository;
-import com.sparta.northwindapi.repo.RegionRepository;
-import com.sparta.northwindapi.repo.TerritoryRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.sparta.northwindapi.dao.*;
+import com.sparta.northwindapi.dto.*;
+import com.sparta.northwindapi.entity.*;
+import com.sparta.northwindapi.repo.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,10 +25,15 @@ public class NorthwindController {
         
     private final EmployeeRepository employeeRepository;
     private final TerritoryRepository territoryRepository;
-    private final RegionRepository regionRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
+    @Autowired
+    private RegionDAO regionDAO;
 
     private final OrderDAO orderDAO;
     private final SupplierDAO supplierDAO;
+    private TerritoryDAO territoryDAO;
 
     private ObjectMapper mapper;
     private HttpHeaders headers;
@@ -53,12 +47,197 @@ public class NorthwindController {
         mapper = new ObjectMapper();
     }
 
+    @GetMapping("/employee/all")
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<String> getEmployee(@PathVariable int id) {
+        Optional<Employee> foundEmployee = employeeRepository.findById(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (foundEmployee.isPresent()) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(foundEmployee.get()), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Employee not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PostMapping("/employee")
+    public ResponseEntity<String> addNewEmployee(@RequestBody Employee newEmployee) {
+        Employee savedEmployee = employeeRepository.save(newEmployee);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (savedEmployee != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(savedEmployee), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Employee could not be added\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @DeleteMapping("/employee/remove/{id}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable(name = "id") int id) {
+        Optional<Employee> foundEmployee = employeeRepository.findById(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (foundEmployee.isPresent()) {
+            employeeRepository.delete(foundEmployee.get());
+            result = new ResponseEntity<>(
+                        "Employee removed", headers,
+                        HttpStatus.OK);
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Employee could not be removed\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @GetMapping("/region/all")
+    public ResponseEntity<String> getAllRegions() {
+        List<RegionDTO> regions = regionDAO.getAll();
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result;
+        if (regions != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(regions), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            result = new ResponseEntity<>("{\"message\":\"Regions not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @GetMapping("/region/{id}")
+    public ResponseEntity<String> getRegion(@PathVariable int id) {
+        RegionDTO region = regionDAO.get(id);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result;
+        if (region != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(region), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            result = new ResponseEntity<>("{\"message\":\"Region not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PostMapping("/region")
+    public ResponseEntity<String> createRegion(@RequestBody RegionDTO region) {
+        RegionDTO inserted = regionDAO.create(region);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result;
+        if (inserted != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(inserted), headers,
+                            HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            result = new ResponseEntity<>("{\"message\":\"Region already exists\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PatchMapping("/region/{id}")
+    public ResponseEntity<String> updateRegion(@PathVariable int id, @RequestBody RegionDTO region) {
+        RegionDTO updated = regionDAO.update(region, id);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type", "application/json");
+        ResponseEntity<String> result;
+        if (updated != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(updated), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            result = new ResponseEntity<>("{\"message\":\"Region not found\"}", HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PutMapping("/region/{id}")
+    public RegionDTO updateOrCreateRegion(@PathVariable int id, @RequestBody RegionDTO region) {
+        return regionDAO.updateOrCreate(region, id);
+    }
+
+    @DeleteMapping("/region/{id}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteRegionById(@PathVariable int id) { regionDAO.delete(id); }
+
+    @DeleteMapping("/territory/remove/{id}")
+    public ResponseEntity<String> deleteTerritory(@PathVariable(name = "id") String id) {
+        Optional<Territory> foundTerritory = territoryRepository.findById(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (foundTerritory.isPresent()) {
+            territoryRepository.delete(foundTerritory.get());
+            result = new ResponseEntity<>(
+                    "Region removed", headers,
+                    HttpStatus.OK);
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Territory could not be removed\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
     @GetMapping("/order/all")
+    @ResponseStatus(HttpStatus.OK)
     public List<OrderDTO> getAllOrders() {
         return orderDAO.getAllOrders();
     }
 
     @GetMapping("/order/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> getOrder(@PathVariable int id) {
         OrderDTO foundOrder = orderDAO.getByID(id);
         headers = new HttpHeaders();
@@ -81,6 +260,7 @@ public class NorthwindController {
     }
 
     @PostMapping("/order")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addNewOrder(@RequestBody Order newOrder) {
         OrderDTO savedOrder = orderDAO.addNewOrder(newOrder);
         headers = new HttpHeaders();
@@ -103,6 +283,7 @@ public class NorthwindController {
     }
 
     @PatchMapping("/order")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> updateOrder(@RequestBody Order order) {
         OrderDTO updatedOrder = orderDAO.update(order);
         headers = new HttpHeaders();
@@ -125,6 +306,7 @@ public class NorthwindController {
     }
 
     @DeleteMapping("/order/remove/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteOrder(@PathVariable(name = "id") int id) {
         int deletedOrderId = orderDAO.deleteOrder(id);
         headers = new HttpHeaders();
@@ -245,5 +427,51 @@ public class NorthwindController {
                     headers, HttpStatus.OK);
         }
         return result;
+    }
+
+
+    @GetMapping("/territory/all")
+    public List<TerritoryDto> getAllTerritories() {
+        return territoryDAO.getAllTerritories();
+    }
+
+    @GetMapping("/territory/{id}")
+    public ResponseEntity<String> getTerritory(@PathVariable String id) {
+        TerritoryDto foundTerritory = territoryDAO.getTerritoryById(id);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (foundTerritory!= null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(foundTerritory), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PutMapping("/territory/{id}/TerritoryDescription/{newTerritory}")
+    public Territory updateTerritoryName(@PathVariable String id, @PathVariable String newTerritory){
+        Territory t = territoryRepository.findById(id).get();
+        t.setTerritoryDescription(newTerritory);
+        territoryRepository.save(t);
+        return t;
+    }
+
+    @PostMapping("/territory")
+    public Territory newTerritory(String name, String id){
+        Territory c = new Territory();
+        c.setTerritoryDescription(name);
+        c.setId(id);
+        territoryRepository.save(c);
+        return c;
     }
 }

@@ -16,8 +16,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -69,12 +68,22 @@ public class OrderTests {
                 post("http://localhost:8080/order")
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk()).andReturn();
+        ).andExpect(status().isCreated()).andReturn();
 
         assertTrue(result.getResponse().getContentAsString().contains("2222"));
         assertTrue(result.getResponse().getContentAsString().contains("Boaty McBoatFace"));
         assertTrue(result.getResponse().getContentAsString().contains("05454-876"));
         assertTrue(result.getResponse().getContentAsString().contains("Brazil"));
+    }
+
+    @Test
+    public void removeOrder() throws Exception {
+        MvcResult result = mockMvc.perform(
+                delete("http://localhost:8080/order/remove/10249")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("Order removed"));
     }
 
 }
