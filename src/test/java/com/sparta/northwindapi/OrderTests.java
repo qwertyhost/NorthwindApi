@@ -35,7 +35,7 @@ public class OrderTests {
                 new Date(1996,7,8), new BigDecimal(99.77), "Boaty McBoatFace", "A port", "A city",
                 "RJ","05454-876","Brazil");
         String body = objectMapper.writeValueAsString(newOrder);
-        MvcResult result = mockMvc.perform(
+        MvcResult setup = mockMvc.perform(
                 post("http://localhost:8080/order")
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,6 +69,16 @@ public class OrderTests {
     }
 
     @Test
+    public void getOrders_notFound() throws Exception{
+        MvcResult result = mockMvc.perform(
+                get("http://localhost:8080/order/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("Order not found"));
+    }
+
+    @Test
     public void postOrder() throws Exception {
         OrderDTO newOrder = new OrderDTO(2223,new Date(1996,7,8),new Date(1996,7,8),
                 new Date(1996,7,8), new BigDecimal(99.77), "Boaty McBoatFace", "A port", "A city",
@@ -87,6 +97,22 @@ public class OrderTests {
     }
 
     @Test
+    public void postOrder_notPosted() throws Exception {
+        OrderDTO newOrder = new OrderDTO(5555,null,null,
+                null, null, null, null, null,
+                null,null,null);
+        String body = objectMapper.writeValueAsString(newOrder);
+        MvcResult result = mockMvc.perform(
+                post("http://localhost:8080/order")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+        assertTrue(result.getResponse().getContentAsString().contains("Order could not be added"));
+    }
+
+    @Test
     public void updateOrder_ShipName() throws Exception {
         OrderDTO newOrder = new OrderDTO(2222,null,null,
                 null, null, "Itsy Bitsy Teeny Weeny Tugboaty", null, null,
@@ -101,6 +127,22 @@ public class OrderTests {
         System.out.println(result.getResponse().getContentAsString());
         assertTrue(result.getResponse().getContentAsString().contains("2222"));
         assertTrue(result.getResponse().getContentAsString().contains("Itsy Bitsy Teeny Weeny Tugboaty"));
+    }
+
+    @Test
+    public void updateOrder_NotAdded() throws Exception {
+        OrderDTO newOrder = new OrderDTO(3333,null,null,
+                null, null, "Itsy Bitsy Teeny Weeny Tugboaty", null, null,
+                null,null,null);
+        String body = objectMapper.writeValueAsString(newOrder);
+        MvcResult result = mockMvc.perform(
+                patch("http://localhost:8080/order")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+        assertTrue(result.getResponse().getContentAsString().contains("Order could not be updated"));
     }
 
     @Test
@@ -122,11 +164,11 @@ public class OrderTests {
     @Test
     public void removeOrder() throws Exception {
         MvcResult result = mockMvc.perform(
-                delete("http://localhost:8080/order/remove/2222")
+                delete("http://localhost:8080/order/remove/3333")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk()).andReturn();
 
-        assertTrue(result.getResponse().getContentAsString().contains("Order removed"));
+        assertTrue(result.getResponse().getContentAsString().contains("Order could not be removed"));
     }
 
 }
