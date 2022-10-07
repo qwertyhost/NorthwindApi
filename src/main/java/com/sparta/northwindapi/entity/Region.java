@@ -7,7 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "region")
+@Table(name = "Region")
 public class Region {
     @Id
     @Column(name = "RegionID", nullable = false)
