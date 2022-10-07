@@ -236,17 +236,19 @@ public class NorthwindController {
     }
 
     @GetMapping("/order/all")
+    @ResponseStatus(HttpStatus.OK)
     public List<OrderDTO> getAllOrders() {
         return orderDAO.getAllOrders();
     }
 
     @GetMapping("/order/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> getOrder(@PathVariable int id) {
         OrderDTO foundOrder = orderDAO.getByID(id);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundOrder != null) {
+        if (foundOrder != null && foundOrder.getId() > 0) {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(foundOrder), headers,
@@ -263,16 +265,18 @@ public class NorthwindController {
     }
 
     @PostMapping("/order")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addNewOrder(@RequestBody Order newOrder) {
+        System.out.println(newOrder.getId());
         OrderDTO savedOrder = orderDAO.addNewOrder(newOrder);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (savedOrder != null) {
+        if (savedOrder != null && savedOrder.getId() > 0) {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(savedOrder), headers,
-                        HttpStatus.OK);
+                        HttpStatus.CREATED);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -285,12 +289,13 @@ public class NorthwindController {
     }
 
     @PatchMapping("/order")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> updateOrder(@RequestBody Order order) {
         OrderDTO updatedOrder = orderDAO.update(order);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (updatedOrder != null) {
+        if (updatedOrder != null && updatedOrder.getId() > 0) {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(updatedOrder), headers,
@@ -307,6 +312,7 @@ public class NorthwindController {
     }
 
     @DeleteMapping("/order/remove/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteOrder(@PathVariable(name = "id") int id) {
         int deletedOrderId = orderDAO.deleteOrder(id);
         headers = new HttpHeaders();
@@ -333,6 +339,11 @@ public class NorthwindController {
     @GetMapping("supplier/all/{country}")
     public List<SupplierDTO> getSuppliersByCountry(@PathVariable String country){
         return supplierDAO.getByCountry(country);
+    }
+
+    @GetMapping("supplier/id/{id}")
+    public SupplierDTO getSupplierByID(@PathVariable int id){
+        return supplierDAO.getByID(id);
     }
 
     @PostMapping("/supplier")
@@ -393,10 +404,26 @@ public class NorthwindController {
     }
 
     @PostMapping("/customer")
-    public boolean newCustomer(String id,String companyName,String contactName,String contactTitle,String address,String city,String region,String postalCode,String country,String phone,String fax){
+    public ResponseEntity<String> newCustomer(@RequestBody Customer newCustomer){
         CustomerDAO customerDAO= new CustomerDAO(customerRepo);
-        CustomerDto c = new CustomerDto(id, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
-        return customerDAO.create(c);
+        CustomerDto savedCustomer = customerDAO.create(newCustomer);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (savedCustomer != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(savedCustomer), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Customer could not be added\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
     }
     
     @DeleteMapping("/customer/{id}")

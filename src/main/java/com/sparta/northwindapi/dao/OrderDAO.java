@@ -37,6 +37,9 @@ public class OrderDAO {
     }
 
     public OrderDTO addNewOrder(Order newOrder) {
+        if (newOrder == null || newOrder.getOrderDate() == null ) {
+            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null);
+        }
         Order savedOrder = orderRepository.save(newOrder);
         if (savedOrder != null) {
             return convertOrder(savedOrder);
