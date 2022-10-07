@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.sparta.northwindapi.dao.CustomerDAO;
+import com.sparta.northwindapi.dao.TerritoryDAO;
 import com.sparta.northwindapi.dto.CustomerDto;
+import com.sparta.northwindapi.dto.TerritoryDto;
 import com.sparta.northwindapi.entity.Customer;
 import com.sparta.northwindapi.entity.Employee;
 import com.sparta.northwindapi.entity.Region;
@@ -40,6 +42,7 @@ public class NorthwindController {
 
     private final OrderDAO orderDAO;
     private final SupplierDAO supplierDAO;
+    private TerritoryDAO territoryDAO;
 
     private ObjectMapper mapper;
     private HttpHeaders headers;
@@ -241,4 +244,54 @@ public class NorthwindController {
         }
         return result;
     }
+
+
+    @GetMapping("/territory/all")
+    public List<TerritoryDto> getAllTerritories() {
+        return territoryDAO.getAllTerritories();
+    }
+
+    @GetMapping("/territory/{id}")
+    public ResponseEntity<String> getTerritory(@PathVariable String id) {
+        TerritoryDto foundTerritory = territoryDAO.getTerritoryById(id);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (foundTerritory!= null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(foundTerritory), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+}
+    @PutMapping("/territory/{id}/TerritoryDescription/{newTerritory}")
+    public Territory updateTerritoryName(@PathVariable String id,@PathVariable String newTerritory){
+        Territory t =territoryRepository.findById(id).get();
+        t.setTerritoryDescription(newTerritory);
+        territoryRepository.save(t);
+        return t;
+
+    }
+
+    @PostMapping("/territory")
+    public Territory newTerritory(String name, String id){
+
+        Territory c = new Territory();
+        c.setTerritoryDescription(name);
+        c.setId(id);
+        territoryRepository.save(c);
+        return c;
+    }
+
+
 }
