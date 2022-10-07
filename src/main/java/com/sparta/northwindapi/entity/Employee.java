@@ -265,6 +265,7 @@ public class Employee {
         this.territories = territories;
     }
 
+
     @Override
     public String toString() {
         return "Employee{" +
@@ -284,12 +285,13 @@ public class Employee {
                 ", extension='" + extension + '\'' +
                 ", photo=" + Arrays.toString(photo) +
                 ", notes='" + notes + '\'' +
-                ", reportsTo=" + reportsTo +
-                ", photoPath='" + photoPath + '\'' +
+                ", reportsTo=" + reportsTo.getReportsTo().firstName + " "+ reportsTo.getReportsTo().lastName +
+                ", photoPath='" + (photoPath.length()>0) + '\'' +
                 ", salary=" + salary +
                 ", employees=" + employees +
                 ", orders=" + orders +
                 ", territories=" + territories +
+
                 '}';
     }
 }
