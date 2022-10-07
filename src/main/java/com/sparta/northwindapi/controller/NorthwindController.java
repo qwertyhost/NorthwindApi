@@ -270,7 +270,7 @@ public class NorthwindController {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(savedOrder), headers,
-                        HttpStatus.OK);
+                        HttpStatus.CREATED);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
