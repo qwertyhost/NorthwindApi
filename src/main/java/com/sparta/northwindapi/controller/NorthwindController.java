@@ -2,18 +2,19 @@ package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.northwindapi.dao.CustomerDAO;
+import com.sparta.northwindapi.dto.CustomerDto;
+import com.sparta.northwindapi.entity.Customer;
 import com.sparta.northwindapi.entity.Employee;
 import com.sparta.northwindapi.entity.Region;
 import com.sparta.northwindapi.entity.Territory;
-import com.sparta.northwindapi.repo.EmployeeRepository;
-import com.sparta.northwindapi.repo.EmployeeterritoryRepository;
-import com.sparta.northwindapi.repo.RegionRepository;
-import com.sparta.northwindapi.repo.TerritoryRepository;
+import com.sparta.northwindapi.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +35,9 @@ public class NorthwindController {
 
     @Autowired
     private EmployeeterritoryRepository employeeterritoryRepo;
+
+    @Autowired
+    private CustomerRepository customerRepo;
 
     private ObjectMapper mapper;
     private HttpHeaders headers;
@@ -57,6 +61,14 @@ public class NorthwindController {
     public List<Territory> getEmployeeTerritory(@PathVariable Integer id){
         return employeeterritoryRepo.findAll().stream().filter(c-> c.getEmployeeID().getId() ==id).map(c->c.getTerritoryID()).toList();
     }
+
+    @PatchMapping("/customer/{id}/{companyName}")
+    public Customer updateCustomerName(@PathVariable String id, @PathVariable String companyName){
+        CustomerDto customerDto = new CustomerDto(id,companyName,null,null,null,null,null,null,null,null,null)
+        CustomerDAO customerDAO = new CustomerDAO(customerRepo);
+        return customerDAO.update(customerDto);
+    }
+
 
     @GetMapping("/territory/{id}")
     public ResponseEntity<String> getTerritory(@PathVariable String id) {
