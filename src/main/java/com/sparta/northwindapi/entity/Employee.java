@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "employees")
+@Table(name = "Employees")
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,6 +56,7 @@ public class Employee {
     @Column(name = "Extension", length = 4)
     private String extension;
 
+    @JsonIgnore
     @Column(name = "Photo")
     private byte[] photo;
 
@@ -78,6 +79,7 @@ public class Employee {
     @OneToMany(mappedBy = "reportsTo")
     private Set<Employee> employees = new LinkedHashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "employeeID")
     private Set<Order> orders = new LinkedHashSet<>();
 
