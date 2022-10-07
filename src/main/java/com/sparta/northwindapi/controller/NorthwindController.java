@@ -243,7 +243,7 @@ public class NorthwindController {
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundOrder != null) {
+        if (foundOrder != null && foundOrder.getId() > 0) {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(foundOrder), headers,
@@ -262,11 +262,12 @@ public class NorthwindController {
     @PostMapping("/order")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addNewOrder(@RequestBody Order newOrder) {
+        System.out.println(newOrder.getId());
         OrderDTO savedOrder = orderDAO.addNewOrder(newOrder);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (savedOrder != null) {
+        if (savedOrder != null && savedOrder.getId() > 0) {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(savedOrder), headers,
@@ -289,7 +290,7 @@ public class NorthwindController {
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (updatedOrder != null) {
+        if (updatedOrder != null && updatedOrder.getId() > 0) {
             try {
                 result = new ResponseEntity<>(
                         mapper.writeValueAsString(updatedOrder), headers,
