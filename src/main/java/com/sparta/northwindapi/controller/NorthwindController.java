@@ -2,11 +2,11 @@ package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.northwindapi.dao.EmployeeDAO;
-import com.sparta.northwindapi.dto.EmployeeDTO;
-import com.sparta.northwindapi.entity.Employee;
-import com.sparta.northwindapi.entity.Region;
-import com.sparta.northwindapi.entity.Territory;
+import com.sparta.northwindapi.dao.OrderDAO;
+import com.sparta.northwindapi.dao.SupplierDAO;
+import com.sparta.northwindapi.dto.OrderDTO;
+import com.sparta.northwindapi.dto.SupplierDTO;
+import com.sparta.northwindapi.entity.*;
 import com.sparta.northwindapi.repo.EmployeeRepository;
 import com.sparta.northwindapi.repo.RegionRepository;
 import com.sparta.northwindapi.repo.TerritoryRepository;
@@ -25,153 +25,179 @@ public class NorthwindController {
     private final TerritoryRepository territoryRepository;
     private final RegionRepository regionRepository;
 
+    private final OrderDAO orderDAO;
+    private final SupplierDAO supplierDAO;
+
     private ObjectMapper mapper;
     private HttpHeaders headers;
 
-    public NorthwindController(EmployeeRepository employeeRepository, TerritoryRepository territoryRepository, RegionRepository regionRepository) {
+    public NorthwindController(EmployeeRepository employeeRepository, TerritoryRepository territoryRepository, RegionRepository regionRepository, OrderDAO orderDAO, SupplierDAO supplierDAO) {
         this.employeeRepository = employeeRepository;
         this.territoryRepository = territoryRepository;
         this.regionRepository = regionRepository;
-    }
-
-    //employee
-    @GetMapping("/employee/all")
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
-
-    @GetMapping("/employee/{id}")
-    public ResponseEntity<String> getEmployee(@PathVariable int id) {
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
+        this.orderDAO = orderDAO;
+        this.supplierDAO = supplierDAO;
         mapper = new ObjectMapper();
+    }
+
+    @GetMapping("/order/all")
+    public List<OrderDTO> getAllOrders() {
+        return orderDAO.getAllOrders();
+    }
+
+    @GetMapping("/order/{id}")
+    public ResponseEntity<String> getOrder(@PathVariable int id) {
+        OrderDTO foundOrder = orderDAO.getByID(id);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundEmployee.isPresent()) {
+        if (foundOrder != null) {
             try {
                 result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundEmployee.get()), headers,
+                        mapper.writeValueAsString(foundOrder), headers,
                         HttpStatus.OK);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
         else {
-            result = new ResponseEntity<>("{\"message\":\"Employee not found\"}",
+            result = new ResponseEntity<>("{\"message\":\"Order not found\"}",
                     headers, HttpStatus.OK);
         }
         return result;
     }
 
-    @DeleteMapping("/employee/{id}")
-    public ResponseEntity<String> removeEmployee(@PathVariable int id,@RequestBody EmployeeDAO employeeDAO){
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
-        mapper = new ObjectMapper();
+    @PostMapping("/order")
+    public ResponseEntity<String> addNewOrder(@RequestBody Order newOrder) {
+        OrderDTO savedOrder = orderDAO.addNewOrder(newOrder);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundEmployee.isPresent()) {
-            employeeRepository.delete(foundEmployee.get());
-            employeeDAO.delete(id);
+        if (savedOrder != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(savedOrder), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Order could not be added\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PatchMapping("/order")
+    public ResponseEntity<String> updateOrder(@RequestBody Order order) {
+        OrderDTO updatedOrder = orderDAO.update(order);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (updatedOrder != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(updatedOrder), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Order could not be updated\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @DeleteMapping("/order/remove/{id}")
+    public ResponseEntity<String> deleteOrder(@PathVariable(name = "id") int id) {
+        int deletedOrderId = orderDAO.deleteOrder(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (deletedOrderId != -1) {
             result = new ResponseEntity<>(
-                    "Region "+id+" removed", headers,
+                    "Order removed", headers,
                     HttpStatus.OK);
         }
         else {
-            result = new ResponseEntity<>("{\"message\":\"Employee not found\"}",
+            result = new ResponseEntity<>("{\"message\":\"Order could not be removed\"}",
                     headers, HttpStatus.OK);
         }
         return result;
     }
 
-    @PatchMapping("/employee/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable int id, @PathVariable EmployeeDAO employeeDAO){
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
-        mapper = new ObjectMapper();
+    // ---
+    @GetMapping("/supplier/all")
+    public List<SupplierDTO> getAllSuppliers(){
+        return supplierDAO.getAllSuppliers();
+    }
+
+    @GetMapping("supplier/all/{country}")
+    public List<SupplierDTO> getSuppliersByCountry(@PathVariable String country){
+        return supplierDAO.getByCountry(country);
+    }
+
+    @PostMapping("/supplier")
+    public ResponseEntity<String> addNewSupplier(@RequestBody Supplier newSupplier) {
+        SupplierDTO savedSupplier = supplierDAO.addNewSupplier(newSupplier);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
-        if (foundEmployee.isPresent()) {
-            employeeRepository.delete(foundEmployee.get());
-            employeeDAO.update(employeeDAO,id);
+        if (savedSupplier != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(savedSupplier), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Supplier could not be added\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PatchMapping("/supplier")
+    public ResponseEntity<String> updateSupplier(@RequestBody Supplier supplier) {
+        SupplierDTO updatedSupplier = supplierDAO.update(supplier);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (updatedSupplier != null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(updatedSupplier), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Supplier could not be updated\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+
+    @DeleteMapping("/supplier/remove/{id}")
+    public ResponseEntity<String> deleteSupplier(@PathVariable(name = "id") int id) {
+        int deletedSupplierId = supplierDAO.deleteSupplier(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (deletedSupplierId != -1) {
             result = new ResponseEntity<>(
-                    "Region "+id+" removed and replaced with "+ employeeDAO.toString(), headers,
+                    "Supplier removed", headers,
                     HttpStatus.OK);
         }
         else {
-            result = new ResponseEntity<>("{\"message\":\"Employee not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @PutMapping("/employee/{id}")
-    public ResponseEntity<String> createorupdateEmployee(@PathVariable int id, @PathVariable Employee employeeDAO){
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
-        mapper = new ObjectMapper();
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (!foundEmployee.isPresent()) {
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Employee is already present\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-    //region
-    @GetMapping("/region/all")
-    public List<Region> getAllRegions() {
-        return regionRepository.findAll();
-    }
-
-    @GetMapping("/region/{id}")
-    public ResponseEntity<String> getRegion(@PathVariable int id) {
-        Optional<Region> foundRegion = regionRepository.findById(id);
-        mapper = new ObjectMapper();
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundRegion.isPresent()) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundRegion.get()), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Region not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-    //territory
-    @GetMapping("/territory/all")
-    public List<Territory> getAllTerritories() {
-        return territoryRepository.findAll();
-    }
-
-    @GetMapping("/territory/{id}")
-    public ResponseEntity<String> getTerritory(@PathVariable String id) {
-        Optional<Territory> foundTerritory = territoryRepository.findById(id);
-        mapper = new ObjectMapper();
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundTerritory.isPresent()) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundTerritory.get()), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
+            result = new ResponseEntity<>("{\"message\":\"Supplier could not be removed\"}",
                     headers, HttpStatus.OK);
         }
         return result;
