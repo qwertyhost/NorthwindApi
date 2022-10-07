@@ -216,28 +216,6 @@ public class NorthwindController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteRegionById(@PathVariable int id) { regionDAO.delete(id); }
 
-    @PostMapping("/territory")
-    public ResponseEntity<String> addNewTerritory(@RequestBody Territory newTerritory) {
-        Territory savedTerritory = territoryRepository.save(newTerritory);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (savedTerritory != null) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(savedTerritory), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Territory could not be added\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
     @DeleteMapping("/territory/remove/{id}")
     public ResponseEntity<String> deleteTerritory(@PathVariable(name = "id") String id) {
         Optional<Territory> foundTerritory = territoryRepository.findById(id);
