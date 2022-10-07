@@ -63,8 +63,8 @@ public class NorthwindController {
     }
 
     @PatchMapping("/customer/{id}/{companyName}")
-    public Customer updateCustomerName(@PathVariable String id, @PathVariable String companyName){
-        CustomerDto customerDto = new CustomerDto(id,companyName,null,null,null,null,null,null,null,null,null)
+    public CustomerDto updateCustomerName(@PathVariable String id, @PathVariable String companyName){
+        CustomerDto customerDto = new CustomerDto(id,companyName,null,null,null,null,null,null,null,null,null);
         CustomerDAO customerDAO = new CustomerDAO(customerRepo);
         return customerDAO.update(customerDto);
     }
