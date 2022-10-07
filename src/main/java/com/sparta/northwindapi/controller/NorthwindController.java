@@ -1,18 +1,17 @@
 package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.northwindapi.dao.*;
-import com.sparta.northwindapi.dto.*;
-import com.sparta.northwindapi.entity.*;
-import com.sparta.northwindapi.repo.EmployeeRepository;
-import com.sparta.northwindapi.repo.RegionRepository;
-import com.sparta.northwindapi.repo.TerritoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.sparta.northwindapi.dao.*;
+import com.sparta.northwindapi.dto.*;
+import com.sparta.northwindapi.repo.*;
+import com.sparta.northwindapi.entity.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +19,10 @@ import java.util.Optional;
 @RestController
 public class NorthwindController {
 
+
+    @Autowired
+    private CustomerRepository customerRepo;
+        
     private final EmployeeRepository employeeRepository;
     private final TerritoryRepository territoryRepository;
 
@@ -418,8 +421,33 @@ public class NorthwindController {
         }
         return result;
     }
+    
+    @PatchMapping("/customer/{id}/{companyName}")
+    public CustomerDto updateCustomerName(@PathVariable String id, @PathVariable String companyName) {
+        CustomerDto customerDto = new CustomerDto(id, companyName, null, null, null, null, null, null, null, null, null);
+        CustomerDAO customerDAO = new CustomerDAO(customerRepo);
+        return customerDAO.update(customerDto);
+    }
 
+    @GetMapping("/customer/all")
+    public List<Customer> getAllCustomers(){
+        CustomerDAO customerDAO = new CustomerDAO(customerRepo);
+        return customerDAO.readAll();
+    }
 
+    @PostMapping("/customer")
+    public boolean newCustomer(String id,String companyName,String contactName,String contactTitle,String address,String city,String region,String postalCode,String country,String phone,String fax){
+        CustomerDAO customerDAO= new CustomerDAO(customerRepo);
+        CustomerDto c = new CustomerDto(id, companyName, contactName, contactTitle, address, city, region, postalCode, country, phone, fax);
+        return customerDAO.create(c);
+    }
+    
+    @DeleteMapping("/customer/{id}")
+    public void deleteCustomer(@PathVariable String id){
+        CustomerDAO customerDAO= new CustomerDAO(customerRepo);
+        customerDAO.delete(id);
+    }
+    
     @DeleteMapping("/supplier/remove/{id}")
     public ResponseEntity<String> deleteSupplier(@PathVariable(name = "id") int id) {
         int deletedSupplierId = supplierDAO.deleteSupplier(id);
@@ -433,6 +461,7 @@ public class NorthwindController {
         }
         else {
             result = new ResponseEntity<>("{\"message\":\"Supplier could not be removed\"}",
+
                     headers, HttpStatus.OK);
         }
         return result;
