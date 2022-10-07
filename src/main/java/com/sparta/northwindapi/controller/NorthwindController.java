@@ -115,6 +115,11 @@ public class NorthwindController {
         return result;
     }
 
+    @PutMapping("/employee/{id}")
+    public EmployeeDTO updateOrCreateEmployee(@PathVariable int id, @RequestBody EmployeeDTO employee) {
+        return EmployeeDAO.updateOrCreate(employee, id);
+    }
+
     @GetMapping("/region/all")
     public ResponseEntity<String> getAllRegions() {
         List<RegionDTO> regions = regionDAO.getAll();
