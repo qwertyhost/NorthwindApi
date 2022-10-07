@@ -6,9 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.northwindapi.dao.CustomerDAO;
 import com.sparta.northwindapi.dto.CustomerDto;
 import com.sparta.northwindapi.entity.Customer;
-import com.sparta.northwindapi.entity.Employee;
-import com.sparta.northwindapi.entity.Region;
-import com.sparta.northwindapi.entity.Territory;
 import com.sparta.northwindapi.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.sparta.northwindapi.dao.OrderDAO;
@@ -23,9 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class NorthwindController {
