@@ -52,11 +52,13 @@ public class NorthwindController {
     }
 
     @GetMapping("/order/all")
+    @ResponseStatus(HttpStatus.OK)
     public List<OrderDTO> getAllOrders() {
         return orderDAO.getAllOrders();
     }
 
     @GetMapping("/order/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> getOrder(@PathVariable int id) {
         OrderDTO foundOrder = orderDAO.getByID(id);
         headers = new HttpHeaders();
@@ -79,6 +81,7 @@ public class NorthwindController {
     }
 
     @PostMapping("/order")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addNewOrder(@RequestBody Order newOrder) {
         OrderDTO savedOrder = orderDAO.addNewOrder(newOrder);
         headers = new HttpHeaders();
@@ -101,6 +104,7 @@ public class NorthwindController {
     }
 
     @PatchMapping("/order")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> updateOrder(@RequestBody Order order) {
         OrderDTO updatedOrder = orderDAO.update(order);
         headers = new HttpHeaders();
@@ -123,6 +127,7 @@ public class NorthwindController {
     }
 
     @DeleteMapping("/order/remove/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteOrder(@PathVariable(name = "id") int id) {
         int deletedOrderId = orderDAO.deleteOrder(id);
         headers = new HttpHeaders();
@@ -268,7 +273,7 @@ public class NorthwindController {
         }
         return result;
     }
-}
+
     @PutMapping("/territory/{id}/TerritoryDescription/{newTerritory}")
     public Territory updateTerritoryName(@PathVariable String id,@PathVariable String newTerritory){
         Territory t =territoryRepository.findById(id).get();
