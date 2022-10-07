@@ -41,7 +41,7 @@ public class CustomerTests {
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk()).andReturn();
 
-        assertTrue(result.getResponse().getContentAsString().contains("25000"));
+        assertTrue(result.getResponse().getContentAsString().contains("ABCDE"));
         assertTrue(result.getResponse().getContentAsString().contains("London"));
         assertTrue(result.getResponse().getContentAsString().contains("05454-876"));
         assertTrue(result.getResponse().getContentAsString().contains("Narnia"));
