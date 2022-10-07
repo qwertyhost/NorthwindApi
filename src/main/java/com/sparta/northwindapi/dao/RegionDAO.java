@@ -43,6 +43,7 @@ public class RegionDAO {
         return new RegionDTO(inserted.getId(), inserted.getRegionDescription());
     }
 
+    // ID provided in region JSON object is ignored, only ID passed in the URL is used
     public RegionDTO update(RegionDTO updated, int id) {
         boolean exists = this.get(id) != null;
         if (!exists)
@@ -61,4 +62,6 @@ public class RegionDAO {
         Region result = REPO.save(toUpdate);
         return new RegionDTO(result.getId(), result.getRegionDescription());
     }
+
+    public void delete(int id) { REPO.deleteById(id); }
 }

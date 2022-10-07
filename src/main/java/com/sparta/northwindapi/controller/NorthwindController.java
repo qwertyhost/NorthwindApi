@@ -162,6 +162,10 @@ public class NorthwindController {
         return regionDAO.updateOrCreate(region, id);
     }
 
+    @DeleteMapping("/region/{id}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteRegionById(@PathVariable int id) { regionDAO.delete(id); }
+
     @GetMapping("/territory/all")
     public List<Territory> getAllTerritories() {
         return territoryRepository.findAll();
