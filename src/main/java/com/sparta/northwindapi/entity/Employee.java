@@ -152,17 +152,13 @@ public class Employee {
         this.address = address;
     }
 
-    public String getCity() {
-        return city;
-    }
+    public String getCity() {return city;}
 
     public void setCity(String city) {
         this.city = city;
     }
 
-    public String getRegion() {
-        return region;
-    }
+    public String getRegion() {return region;}
 
     public void setRegion(String region) {
         this.region = region;

@@ -2,6 +2,8 @@ package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.northwindapi.dao.EmployeeDAO;
+import com.sparta.northwindapi.dto.EmployeeDTO;
 import com.sparta.northwindapi.entity.Employee;
 import com.sparta.northwindapi.entity.Region;
 import com.sparta.northwindapi.entity.Territory;
@@ -62,7 +64,7 @@ public class NorthwindController {
     }
 
     @DeleteMapping("/employee/{id}")
-    public ResponseEntity<String> removeEmployee(@PathVariable int id){
+    public ResponseEntity<String> removeEmployee(@PathVariable int id,@RequestBody EmployeeDAO employeeDAO){
         Optional<Employee> foundEmployee = employeeRepository.findById(id);
         mapper = new ObjectMapper();
         headers = new HttpHeaders();
@@ -70,6 +72,7 @@ public class NorthwindController {
         ResponseEntity<String> result = null;
         if (foundEmployee.isPresent()) {
             employeeRepository.delete(foundEmployee.get());
+            employeeDAO.delete(id);
             result = new ResponseEntity<>(
                     "Region "+id+" removed", headers,
                     HttpStatus.OK);
@@ -82,7 +85,7 @@ public class NorthwindController {
     }
 
     @PatchMapping("/employee/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable int id, @PathVariable Employee employee){
+    public ResponseEntity<String> updateEmployee(@PathVariable int id, @PathVariable EmployeeDAO employeeDAO){
         Optional<Employee> foundEmployee = employeeRepository.findById(id);
         mapper = new ObjectMapper();
         headers = new HttpHeaders();
@@ -90,8 +93,9 @@ public class NorthwindController {
         ResponseEntity<String> result = null;
         if (foundEmployee.isPresent()) {
             employeeRepository.delete(foundEmployee.get());
+            employeeDAO.update(employeeDAO,id);
             result = new ResponseEntity<>(
-                    "Region "+id+" removed and replaced with "+ employee.toString(), headers,
+                    "Region "+id+" removed and replaced with "+ employeeDAO.toString(), headers,
                     HttpStatus.OK);
         }
         else {
@@ -102,7 +106,7 @@ public class NorthwindController {
     }
 
     @PutMapping("/employee/{id}")
-    public ResponseEntity<String> createorupdateEmployee(@PathVariable int id, @PathVariable Employee employee){
+    public ResponseEntity<String> createorupdateEmployee(@PathVariable int id, @PathVariable Employee employeeDAO){
         Optional<Employee> foundEmployee = employeeRepository.findById(id);
         mapper = new ObjectMapper();
         headers = new HttpHeaders();
