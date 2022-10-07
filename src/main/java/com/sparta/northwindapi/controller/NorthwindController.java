@@ -1,8 +1,8 @@
 package com.sparta.northwindapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.sparta.northwindapi.dao.*;
 import com.sparta.northwindapi.dto.*;
-import com.sparta.northwindapi.repo.*;
 import com.sparta.northwindapi.entity.*;
+import com.sparta.northwindapi.repo.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +33,7 @@ public class NorthwindController {
 
     private final OrderDAO orderDAO;
     private final SupplierDAO supplierDAO;
+    private TerritoryDAO territoryDAO;
 
     private ObjectMapper mapper;
     private HttpHeaders headers;
@@ -209,33 +210,6 @@ public class NorthwindController {
     @DeleteMapping("/region/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteRegionById(@PathVariable int id) { regionDAO.delete(id); }
-
-    @GetMapping("/territory/all")
-    public List<Territory> getAllTerritories() {
-        return territoryRepository.findAll();
-    }
-
-    @GetMapping("/territory/{id}")
-    public ResponseEntity<String> getTerritory(@PathVariable String id) {
-        Optional<Territory> foundTerritory = territoryRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundTerritory.isPresent()) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundTerritory.get()), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
 
     @PostMapping("/territory")
     public ResponseEntity<String> addNewTerritory(@RequestBody Territory newTerritory) {
@@ -465,5 +439,51 @@ public class NorthwindController {
                     headers, HttpStatus.OK);
         }
         return result;
+    }
+
+
+    @GetMapping("/territory/all")
+    public List<TerritoryDto> getAllTerritories() {
+        return territoryDAO.getAllTerritories();
+    }
+
+    @GetMapping("/territory/{id}")
+    public ResponseEntity<String> getTerritory(@PathVariable String id) {
+        TerritoryDto foundTerritory = territoryDAO.getTerritoryById(id);
+        mapper = new ObjectMapper();
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (foundTerritory!= null) {
+            try {
+                result = new ResponseEntity<>(
+                        mapper.writeValueAsString(foundTerritory), headers,
+                        HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Territory not found\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PutMapping("/territory/{id}/TerritoryDescription/{newTerritory}")
+    public Territory updateTerritoryName(@PathVariable String id, @PathVariable String newTerritory){
+        Territory t = territoryRepository.findById(id).get();
+        t.setTerritoryDescription(newTerritory);
+        territoryRepository.save(t);
+        return t;
+    }
+
+    @PostMapping("/territory")
+    public Territory newTerritory(String name, String id){
+        Territory c = new Territory();
+        c.setTerritoryDescription(name);
+        c.setId(id);
+        territoryRepository.save(c);
+        return c;
     }
 }
