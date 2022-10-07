@@ -8,6 +8,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "territories")
 public class Territory {
+
     @Id
     @Column(name = "TerritoryID", nullable = false, length = 20)
     private String id;
