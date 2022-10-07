@@ -1,12 +1,13 @@
 package com.sparta.northwindapi.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.sparta.northwindapi.entity.Territory;
+
+import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "region")
+@Table(name = "Region")
 public class Region {
     @Id
     @Column(name = "RegionID", nullable = false)
@@ -31,4 +32,11 @@ public class Region {
         this.regionDescription = regionDescription;
     }
 
+    @Override
+    public String toString() {
+        return "Region{" +
+                "id=" + id +
+                ", regionDescription='" + regionDescription + '\'' +
+                '}';
+    }
 }

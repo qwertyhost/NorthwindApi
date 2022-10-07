@@ -3,7 +3,7 @@ package com.sparta.northwindapi.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "employeeterritories")
+@Table(name = "EmployeeTerritories")
 public class Employeeterritory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EmbeddedId
@@ -43,4 +43,12 @@ public class Employeeterritory {
         this.territoryID = territoryID;
     }
 
+    @Override
+    public String toString() {
+        return "Employeeterritory{" +
+                "id=" + id +
+                ", employeeID=" + employeeID +
+                ", territoryID=" + territoryID +
+                '}';
+    }
 }
