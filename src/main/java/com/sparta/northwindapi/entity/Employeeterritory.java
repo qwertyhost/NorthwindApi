@@ -3,7 +3,7 @@ package com.sparta.northwindapi.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "employeeterritories")
+@Table(name = "EmployeeTerritories")
 public class Employeeterritory {
     @EmbeddedId
     private EmployeeterritoryId id;
