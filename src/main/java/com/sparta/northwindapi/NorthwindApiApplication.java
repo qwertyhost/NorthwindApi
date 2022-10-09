@@ -9,5 +9,4 @@ public class NorthwindApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NorthwindApiApplication.class, args);
 	}
-
 }

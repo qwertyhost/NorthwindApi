@@ -31,6 +31,8 @@ public class NorthwindController {
     @Autowired
     private RegionDAO regionDAO;
 
+    private EmployeeDAO employeeDAO;
+
     private final OrderDAO orderDAO;
     private final SupplierDAO supplierDAO;
     private TerritoryDAO territoryDAO;
@@ -74,9 +76,36 @@ public class NorthwindController {
         return result;
     }
 
+    @DeleteMapping("/employee/remove/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> deleteEmployee(@PathVariable(name = "id") int id) {
+        EmployeeDAO employeeDAO= new EmployeeDAO(employeeRepository);
+        int deletedEmployeeId = employeeDAO.delete(id);
+        headers = new HttpHeaders();
+        headers.add("content-type","application/json");
+        ResponseEntity<String> result = null;
+        if (deletedEmployeeId != -1) {
+            result = new ResponseEntity<>(
+                    "Employee removed", headers,
+                    HttpStatus.OK);
+        }
+        else {
+            result = new ResponseEntity<>("{\"message\":\"Employee could not be removed\"}",
+                    headers, HttpStatus.OK);
+        }
+        return result;
+    }
+
+    @PutMapping("/employee/{id}")
+    public EmployeeDTO updateOrCreateEmployee(@PathVariable int id, @RequestBody EmployeeDTO employee) {
+        EmployeeDAO employeeDAO= new EmployeeDAO(employeeRepository);
+        return employeeDAO.updateOrCreate(employee, id);
+    }
+
     @PostMapping("/employee")
-    public ResponseEntity<String> addNewEmployee(@RequestBody Employee newEmployee) {
-        Employee savedEmployee = employeeRepository.save(newEmployee);
+    public ResponseEntity<String> addNewEmployee(@RequestBody Employee newEmployee){
+        EmployeeDAO employeeDAO= new EmployeeDAO(employeeRepository);
+        EmployeeDTO savedEmployee = employeeDAO.create(newEmployee);
         headers = new HttpHeaders();
         headers.add("content-type","application/json");
         ResponseEntity<String> result = null;
@@ -90,34 +119,10 @@ public class NorthwindController {
             }
         }
         else {
-            result = new ResponseEntity<>("{\"message\":\"Employee could not be added\"}",
+            result = new ResponseEntity<>("{\"message\":\"Employee already exists.\"}",
                     headers, HttpStatus.OK);
         }
         return result;
-    }
-
-    @DeleteMapping("/employee/remove/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable(name = "id") int id) {
-        Optional<Employee> foundEmployee = employeeRepository.findById(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundEmployee.isPresent()) {
-            employeeRepository.delete(foundEmployee.get());
-            result = new ResponseEntity<>(
-                        "Employee removed", headers,
-                        HttpStatus.OK);
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Employee could not be removed\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
-    }
-
-    @PutMapping("/employee/{id}")
-    public EmployeeDTO updateOrCreateEmployee(@PathVariable int id, @RequestBody EmployeeDTO employee) {
-        return EmployeeDAO.updateOrCreate(employee, id);
     }
 
     @GetMapping("/region/all")
@@ -450,7 +455,6 @@ public class NorthwindController {
         }
         return result;
     }
-
 
     @GetMapping("/territory/all")
     public List<TerritoryDto> getAllTerritories() {

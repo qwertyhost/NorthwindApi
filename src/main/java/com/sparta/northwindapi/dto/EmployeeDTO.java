@@ -3,6 +3,7 @@ package com.sparta.northwindapi.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.northwindapi.entity.Employee;
 import com.sparta.northwindapi.entity.Order;
+import com.sparta.northwindapi.entity.Territory;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -33,10 +34,12 @@ public class EmployeeDTO {
     private Set<Employee> employees = new LinkedHashSet<>();
     private Set<Order> orders = new LinkedHashSet<>();
 
+    private Set<Territory> territories = new LinkedHashSet<>();
+
     public EmployeeDTO() {
     }
 
-    public EmployeeDTO(Integer ID, String FirstName, String LastName, String Title, String titleOfCourtesy, Date birthDate, Date hireDate, String address,String city,String region,String postalCode,String country,String homePhone,String extension,byte[] photo,String notes,Employee reportsTo,String photoPath,Float salary,Set<Employee> employees,Set<Order> orders) {
+    public EmployeeDTO(Integer ID, String FirstName, String LastName, String Title, String titleOfCourtesy, Date birthDate, Date hireDate, String address,String city,String region,String postalCode,String country,String homePhone,String extension,byte[] photo,String notes,Employee reportsTo,String photoPath,Float salary,Set<Employee> employees,Set<Order> orders,Set<Territory> territory) {
         this.id = ID;
         this.firstName=FirstName;
         this.lastName=LastName;
@@ -58,6 +61,7 @@ public class EmployeeDTO {
         this.salary=salary;
         this.employees=employees;
         this.orders=orders;
+        this.territories=territory;
     }
     public int getId() {
         return id;
@@ -219,6 +223,13 @@ public class EmployeeDTO {
     public void setOrders(Set<Order> orders) {
         this.orders = orders;
     }
+    public Set<Territory> getTerritories() {
+        return territories;
+    }
+
+    public void setTerritories(Set<Territory> territories) {
+        this.territories = territories;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -250,7 +261,7 @@ public class EmployeeDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, title, titleOfCourtesy, birthDate, hireDate, address, city, region, postalCode,country,homePhone,extension,photo,notes,reportsTo,photoPath,salary,employees,orders);
+        return Objects.hash(id, firstName, lastName, title, titleOfCourtesy, birthDate, hireDate, address, city, region, postalCode,country,homePhone,extension,photo,notes,reportsTo,photoPath,salary,employees,orders,territories);
     }
 
     @Override
@@ -276,6 +287,7 @@ public class EmployeeDTO {
                 "photo path = " + photoPath+", "+
                 "salary = " + salary+", "+
                 "employees = " + employees+", "+
-                "orders = " + orders+", ";
+                "orders = " + orders+", "+
+                "territories = " + territories+", ";
     }
 }

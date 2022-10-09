@@ -2,13 +2,14 @@ package com.sparta.northwindapi.dao;
 
 import com.sparta.northwindapi.dto.EmployeeDTO;
 import com.sparta.northwindapi.entity.Employee;
+import com.sparta.northwindapi.entity.Order;
 import com.sparta.northwindapi.repo.EmployeeRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 public class EmployeeDAO {
-    private static EmployeeRepository REPO = null;
+    private final EmployeeRepository REPO;
 
     public EmployeeDAO(EmployeeRepository repo) {
         this.REPO = repo;
@@ -21,7 +22,7 @@ public class EmployeeDAO {
             employee = optional.get();
         else
             return null;
-        return new EmployeeDTO();
+        return getEmployeeDTO(employee);
     }
 
     public EmployeeDTO create(EmployeeDTO employee) {
@@ -30,29 +31,7 @@ public class EmployeeDAO {
             return null;
         Employee toInsert = new Employee();
         toInsert.setId(employee.getId());
-        toInsert.setLastName(toInsert.getLastName());
-        toInsert.setFirstName(toInsert.getFirstName());
-        toInsert.setTitle(toInsert.getTitle());
-        toInsert.setTitleOfCourtesy(toInsert.getTitleOfCourtesy());
-        toInsert.setBirthDate(toInsert.getBirthDate());
-        toInsert.setHireDate(toInsert.getHireDate());
-        toInsert.setAddress(toInsert.getAddress());
-        toInsert.setCity(toInsert.getCity());
-        toInsert.setRegion(toInsert.getRegion());
-        toInsert.setPostalCode(toInsert.getPostalCode());
-        toInsert.setCountry(toInsert.getCountry());
-        toInsert.setHomePhone(toInsert.getHomePhone());
-        toInsert.setExtension(toInsert.getExtension());
-        toInsert.setPhoto(toInsert.getPhoto());
-        toInsert.setNotes(toInsert.getNotes());
-        toInsert.setReportsTo(toInsert.getReportsTo());
-        toInsert.setPhotoPath(toInsert.getPhotoPath());
-        toInsert.setSalary(toInsert.getSalary());
-        toInsert.setEmployees(toInsert.getEmployees());
-        toInsert.setOrders(toInsert.getOrders());
-
-        Employee inserted = REPO.save(toInsert);
-        return new EmployeeDTO(inserted.getId(), inserted.getFirstName(), inserted.getLastName(), inserted.getTitle(), inserted.getTitleOfCourtesy(), inserted.getBirthDate(), inserted.getHireDate(), inserted.getAddress(), inserted.getCity(), inserted.getRegion(), inserted.getPostalCode(), inserted.getCountry(), inserted.getHomePhone(), inserted.getExtension(), inserted.getPhoto(), inserted.getNotes(), inserted.getReportsTo(), inserted.getPhotoPath(), inserted.getSalary(), inserted.getEmployees(),inserted.getOrders());
+        return getEmployeeDTO(toInsert, toInsert);
     }
 
     public EmployeeDTO update(int id) {
@@ -61,35 +40,18 @@ public class EmployeeDAO {
             return null;
         Employee toInsert = new Employee();
         toInsert.setId(toInsert.getId());
-        toInsert.setLastName(toInsert.getLastName());
-        toInsert.setFirstName(toInsert.getFirstName());
-        toInsert.setTitle(toInsert.getTitle());
-        toInsert.setTitleOfCourtesy(toInsert.getTitleOfCourtesy());
-        toInsert.setBirthDate(toInsert.getBirthDate());
-        toInsert.setHireDate(toInsert.getHireDate());
-        toInsert.setAddress(toInsert.getAddress());
-        toInsert.setCity(toInsert.getCity());
-        toInsert.setRegion(toInsert.getRegion());
-        toInsert.setPostalCode(toInsert.getPostalCode());
-        toInsert.setCountry(toInsert.getCountry());
-        toInsert.setHomePhone(toInsert.getHomePhone());
-        toInsert.setExtension(toInsert.getExtension());
-        toInsert.setPhoto(toInsert.getPhoto());
-        toInsert.setNotes(toInsert.getNotes());
-        toInsert.setReportsTo(toInsert.getReportsTo());
-        toInsert.setPhotoPath(toInsert.getPhotoPath());
-        toInsert.setSalary(toInsert.getSalary());
-        toInsert.setEmployees(toInsert.getEmployees());
-        toInsert.setOrders(toInsert.getOrders());
-
-        Employee inserted = REPO.save(toInsert);
-        return new EmployeeDTO(inserted.getId(), inserted.getFirstName(), inserted.getLastName(), inserted.getTitle(), inserted.getTitleOfCourtesy(), inserted.getBirthDate(), inserted.getHireDate(), inserted.getAddress(), inserted.getCity(), inserted.getRegion(), inserted.getPostalCode(), inserted.getCountry(), inserted.getHomePhone(), inserted.getExtension(), inserted.getPhoto(), inserted.getNotes(), inserted.getReportsTo(), inserted.getPhotoPath(), inserted.getSalary(), inserted.getEmployees(),inserted.getOrders());
+        return getEmployeeDTO(toInsert, toInsert);
 
     }
 
-    public static EmployeeDTO updateOrCreate(EmployeeDTO updated, int id) {
-        Employee toInsert = new Employee();
-        toInsert.setId(id);
+    public EmployeeDTO updateOrCreate(EmployeeDTO updated, int id) {
+        boolean exists = this.get(id) != null;
+        if (exists)
+            return update(id);
+        return create(updated);
+    }
+
+    private EmployeeDTO getEmployeeDTO(EmployeeDTO updated, Employee toInsert) {
         toInsert.setLastName(updated.getLastName());
         toInsert.setFirstName(updated.getFirstName());
         toInsert.setTitle(updated.getTitle());
@@ -110,16 +72,25 @@ public class EmployeeDAO {
         toInsert.setSalary(updated.getSalary());
         toInsert.setEmployees(updated.getEmployees());
         toInsert.setOrders(updated.getOrders());
+        toInsert.setTerritories(toInsert.getTerritories());
 
         Employee inserted = REPO.save(toInsert);
-        return new EmployeeDTO(inserted.getId(), inserted.getFirstName(), inserted.getLastName(), inserted.getTitle(), inserted.getTitleOfCourtesy(), inserted.getBirthDate(), inserted.getHireDate(), inserted.getAddress(), inserted.getCity(), inserted.getRegion(), inserted.getPostalCode(), inserted.getCountry(), inserted.getHomePhone(), inserted.getExtension(), inserted.getPhoto(), inserted.getNotes(), inserted.getReportsTo(), inserted.getPhotoPath(), inserted.getSalary(), inserted.getEmployees(),inserted.getOrders());
+        return getEmployeeDTO(inserted);
     }
 
-    public long getEmployeeAmount(int id) {
-        return REPO.count();
+    private EmployeeDTO getEmployeeDTO(Employee inserted) {
+        return getEmployeeDTO(inserted);
     }
 
-    public void delete(int id) { REPO.deleteById(id); }
+    public int delete(int id) {
+        Optional<Employee> optional = REPO.findById(id);
+        if (optional.isPresent()) {
+            REPO.delete(optional.get());
+            return optional.get().getId();
+        }
+        else {
+            return -1;
+        } }
 
     public List<EmployeeDTO> getAllEmployees() {
         List<Employee> employees = REPO.findAll();
@@ -128,7 +99,7 @@ public class EmployeeDAO {
         return employees.stream().map(r -> new EmployeeDTO()).toList();
     }
     public EmployeeDTO convertEmployee(Employee employee) {
-        EmployeeDTO converted = new EmployeeDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getTitle(), employee.getTitleOfCourtesy(), employee.getBirthDate(), employee.getHireDate(), employee.getAddress(), employee.getCity(), employee.getRegion(), employee.getPostalCode(), employee.getCountry(), employee.getHomePhone(), employee.getExtension(), employee.getPhoto(), employee.getNotes(), employee.getReportsTo(), employee.getPhotoPath(), employee.getSalary(), employee.getEmployees(),employee.getOrders());
+        EmployeeDTO converted = new EmployeeDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getTitle(), employee.getTitleOfCourtesy(), employee.getBirthDate(), employee.getHireDate(), employee.getAddress(), employee.getCity(), employee.getRegion(), employee.getPostalCode(), employee.getCountry(), employee.getHomePhone(), employee.getExtension(), employee.getPhoto(), employee.getNotes(), employee.getReportsTo(), employee.getPhotoPath(), employee.getSalary(), employee.getEmployees(),employee.getOrders(),employee.getTerritories());
         return converted;
     }
 }

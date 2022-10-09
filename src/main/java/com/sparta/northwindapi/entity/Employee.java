@@ -1,6 +1,7 @@
 package com.sparta.northwindapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sparta.northwindapi.dto.EmployeeDTO;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "employees")
-public class Employee {
+public class Employee extends EmployeeDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EmployeeID", nullable = false)
@@ -87,7 +88,7 @@ public class Employee {
             inverseJoinColumns = @JoinColumn(name = "TerritoryID"))
     private Set<Territory> territories = new LinkedHashSet<>();
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -279,7 +280,7 @@ public class Employee {
                 ", extension='" + extension + '\'' +
                 ", photo=" + Arrays.toString(photo) +
                 ", notes='" + notes + '\'' +
-                ", reportsTo=" + reportsTo.getReportsTo().firstName + " "+ reportsTo.getReportsTo().lastName +
+                ", reportsTo=" + reportsTo + " "+ reportsTo.getReportsTo().lastName +
                 ", photoPath='" + (photoPath.length()>0) + '\'' +
                 ", salary=" + salary +
                 ", employees=" + employees +
