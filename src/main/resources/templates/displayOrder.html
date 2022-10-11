@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Northwind - All Orders</title>
+    <link th:href="@{/styles/mainStyle.css}" rel="stylesheet"/>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+</head>
+<body>
+    <div>
+        <div th:if="${foundOrder != null}">
+            <h2>Found order</h2>
+            <table>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Employee ID</th>
+                    <th>Order Date</th>
+                    <th>Required Date</th>
+                    <th>Shipped Date</th>
+                    <th>Freight</th>
+                    <th>Ship Name</th>
+                    <th>Ship City</th>
+                    <th>Ship Region</th>
+                    <th>Ship Postal Code</th>
+                    <th>Ship Country</th>
+                </tr>
+                <tr>
+                    <td th:text="${foundOrder.id}">Order ID</td>
+                    <td th:if="${foundOrder.employeeId != null}" th:text="${foundOrder.employeeId.id}">Employee ID</td>
+                    <td th:if="${foundOrder.employeeId == null}">n/a</td>
+                    <td th:text="${foundOrder.orderDate}">Order Date</td>
+                    <td th:text="${foundOrder.requiredDate}">Required Date</td>
+                    <td th:text="${foundOrder.shippedDate}">Shipped Date</td>
+                    <td th:text="${foundOrder.freight}">Freight</td>
+                    <td th:text="${foundOrder.shipName}">Ship Name</td>
+                    <td th:text="${foundOrder.shipCity}">Ship City</td>
+                    <td th:text="${foundOrder.shipRegion}">Ship Region</td>
+                    <td th:text="${foundOrder.shipPostalCode}">Ship Postal Code</td>
+                    <td th:text="${foundOrder.shipCountry}">Ship Country</td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <h1>Edit Order</h1>
+            <form action="#" th:action="@{/order}" th:object="${foundOrder}" th:method="patch">
+                <label for="order_id" hidden>Order ID: </label>
+                <input hidden class="form-control" type="text" id="order_id" name="order_id" th:field="*{id}"
+                       placeholder="Order ID"/>
+                <label for="required_date" hidden>Required Date: </label>
+                <input class="form-control" type="date" id="required_date" name="required_date" th:field="*{requiredDate}"
+                       placeholder="Required Date"/>
+                <input id="edit_actor_submit_button" type="submit" value="Submit" class="btn btn-info"/>
+                <input type="reset" value="Reset" class="btn btn-info"/>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Northwind - All Orders</title>
+    <link th:href="@{/styles/mainStyle.css}" rel="stylesheet"/>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+</head>
+<body>
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Employee ID</th>
+                <th>Order Date</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tr th:each="order : ${allOrders}">
+                <td th:text="${order.id}">Order ID</td>
+                <td th:if="${order.employeeId != null}" th:text="${order.employeeId.id}">Employee ID</td>
+                <td th:if="${order.employeeId == null}">n/a</td>
+                <td th:text="${order.orderDate}">Order Date</td>
+                <td>
+                    <form action="#" th:action="@{/order}" th:object="${order}" th:method="get" >
+                        <input hidden type="number" id="id" name="id"
+                               th:value="${order.id}"/>
+                        <button type="submit" class="btn btn-info">View Details</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
