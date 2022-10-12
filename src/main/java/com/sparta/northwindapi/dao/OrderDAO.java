@@ -32,19 +32,19 @@ public class OrderDAO {
         if (foundOrder.isPresent()) {
             return convertOrder(foundOrder.get());
         } else {
-            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null);
+            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null,null);
         }
     }
 
     public OrderDTO addNewOrder(Order newOrder) {
         if (newOrder == null || newOrder.getOrderDate() == null ) {
-            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null);
+            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null,null);
         }
         Order savedOrder = orderRepository.save(newOrder);
         if (savedOrder != null) {
             return convertOrder(savedOrder);
         } else {
-            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null);
+            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null,null);
         }
     }
 
@@ -54,7 +54,7 @@ public class OrderDAO {
         if(optional.isPresent()) {
             theOrder = optional.get();
         } else {
-            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null);
+            return new OrderDTO(-1,null,null,null,null,null,null,null,null,null,null,null);
         }
         if (order.getOrderDate() != null) {
             theOrder.setOrderDate(order.getOrderDate());
@@ -88,7 +88,7 @@ public class OrderDAO {
         }
         orderRepository.save(theOrder);
         theOrder = orderRepository.findById(order.getId()).get();
-        return new OrderDTO(theOrder.getId(), theOrder.getOrderDate(), theOrder.getRequiredDate(),
+        return new OrderDTO(theOrder.getId(), theOrder.getEmployeeID(), theOrder.getOrderDate(), theOrder.getRequiredDate(),
                 theOrder.getShippedDate(), theOrder.getFreight(), theOrder.getShipName(),
                 theOrder.getShipAddress(), theOrder.getShipCity(), theOrder.getShipRegion(),
                 theOrder.getShipPostalCode(), theOrder.getShipCountry());
@@ -106,7 +106,7 @@ public class OrderDAO {
     }
 
     public OrderDTO convertOrder(Order theOrder) {
-        OrderDTO converted = new OrderDTO(theOrder.getId(), theOrder.getOrderDate(), theOrder.getRequiredDate(),
+        OrderDTO converted = new OrderDTO(theOrder.getId(), theOrder.getEmployeeID(), theOrder.getOrderDate(), theOrder.getRequiredDate(),
                 theOrder.getShippedDate(), theOrder.getFreight(), theOrder.getShipName(),
                 theOrder.getShipAddress(), theOrder.getShipCity(), theOrder.getShipRegion(),
                 theOrder.getShipPostalCode(), theOrder.getShipCountry());

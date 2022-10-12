@@ -1,5 +1,7 @@
 package com.sparta.northwindapi.dto;
 
+import com.sparta.northwindapi.entity.Employee;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -10,6 +12,8 @@ import java.util.Objects;
  */
 public class OrderDTO implements Serializable {
     private Integer id;
+
+    private Employee employeeId;
     private Date orderDate;
     private Date requiredDate;
     private Date shippedDate;
@@ -24,8 +28,9 @@ public class OrderDTO implements Serializable {
     public OrderDTO() {
     }
 
-    public OrderDTO(Integer id, Date orderDate, Date requiredDate, Date shippedDate, BigDecimal freight, String shipName, String shipAddress, String shipCity, String shipRegion, String shipPostalCode, String shipCountry) {
+    public OrderDTO(Integer id, Employee employeeId, Date orderDate, Date requiredDate, Date shippedDate, BigDecimal freight, String shipName, String shipAddress, String shipCity, String shipRegion, String shipPostalCode, String shipCountry) {
         this.id = id;
+        this.employeeId = employeeId;
         this.orderDate = orderDate;
         this.requiredDate = requiredDate;
         this.shippedDate = shippedDate;
@@ -44,6 +49,14 @@ public class OrderDTO implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Employee getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Employee employeeId) {
+        this.employeeId = employeeId;
     }
 
     public Date getOrderDate() {

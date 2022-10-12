@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.sparta.northwindapi.dao.*;
@@ -16,7 +18,7 @@ import com.sparta.northwindapi.repo.*;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 public class NorthwindController {
 
 
@@ -232,31 +234,18 @@ public class NorthwindController {
 
     @GetMapping("/order/all")
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderDTO> getAllOrders() {
-        return orderDAO.getAllOrders();
+    public String getAllOrders(Model model) {
+        List<OrderDTO> orders = orderDAO.getAllOrders();
+        model.addAttribute("allOrders",orders);
+        return "orders";
     }
 
-    @GetMapping("/order/{id}")
+    @GetMapping("/order")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> getOrder(@PathVariable int id) {
+    public String getOrder(@RequestParam int id, Model model) {
         OrderDTO foundOrder = orderDAO.getByID(id);
-        headers = new HttpHeaders();
-        headers.add("content-type","application/json");
-        ResponseEntity<String> result = null;
-        if (foundOrder != null && foundOrder.getId() > 0) {
-            try {
-                result = new ResponseEntity<>(
-                        mapper.writeValueAsString(foundOrder), headers,
-                        HttpStatus.OK);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            result = new ResponseEntity<>("{\"message\":\"Order not found\"}",
-                    headers, HttpStatus.OK);
-        }
-        return result;
+        model.addAttribute("foundOrder",foundOrder);
+        return "displayOrder";
     }
 
     @PostMapping("/order")
